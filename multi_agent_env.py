@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
+from cryptography.fernet import Fernet
 import pickle
 
 # Code adapted from here: https://github.com/openai/multiagent-particle-envs/blob/master/multiagent/environment.py
