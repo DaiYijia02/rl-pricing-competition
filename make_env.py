@@ -4,8 +4,8 @@ From here mostly: https://github.com/openai/multiagent-particle-envs/blob/master
 from settings import *
 
 
-import algopricing.MultiAgentEnv_algopricing as MultiAgentEnv_algopricing
-from algopricing.MultiAgentEnv_algopricing import MultiAgentEnv_algopricing
+# import multi_agent_env as MultiAgentEnv_algopricing
+from multi_agent_env import MultiAgentEnv_algopricing
 
 
 def make_env_agents(agentnames, params=default_params, first_file=None, second_file=None, third_file=None):
