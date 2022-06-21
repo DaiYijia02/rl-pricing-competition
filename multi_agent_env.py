@@ -13,6 +13,24 @@ import pickle
 # Code adapted from here: https://github.com/openai/multiagent-particle-envs/blob/master/multiagent/environment.py
 # also useful: https://www.ai-articles.net/creating-a-custom-gym-openai-environment-for-algorithmic-trading/
 
+def decrypt_df_columns(df, list_of_columns, secret_key):
+    obj = Fernet(secret_key)
+    for col in list_of_columns:
+        df[col] = df[col].apply(lambda x: float(bytes.fromhex(
+            obj.decrypt(bytes(x[2:-1], 'utf-8')).decode().strip())))
+
+    return df
+
+
+def read_secret_dataframe(secret_file_name_str, secret_key):
+    df = pd.read_csv(secret_file_name_str)
+    df.index = df['Unnamed: 0'].values
+    del df['Unnamed: 0']
+
+    if secret_key is not None:
+        df = decrypt_df_columns(df, df.columns.tolist(), secret_key)
+    return df
+
 class MultiAgentEnv_algopricing(object):  # gym.Env
     def __init__(self, params, agent_names, n_agents=2, customer_covariates_file=None, customer_noisyembeddings_file=None, customer_valuations_file=None):
         self.time = 0
