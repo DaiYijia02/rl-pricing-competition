@@ -12,6 +12,12 @@ import pickle
 # Code adapted from here: https://github.com/openai/multiagent-particle-envs/blob/master/multiagent/environment.py
 # also useful: https://www.ai-articles.net/creating-a-custom-gym-openai-environment-for-algorithmic-trading/
 
+def read_file(file_name_str):
+    df = pd.read_csv(file_name_str)
+    df.index = df['Unnamed: 0'].values
+    del df['Unnamed: 0']
+    return df
+
 class MultiAgentEnv_algopricing(object):  # gym.Env
     def __init__(self, params, agent_names, n_agents=2, customer_covariates_file=None, customer_noisyembeddings_file=None, customer_valuations_file=None):
         self.time = 0
@@ -40,11 +46,11 @@ class MultiAgentEnv_algopricing(object):  # gym.Env
         if self.customer_covariates_file is None:
             return
         else:
-            self.customer_covariates = read_secret_dataframe(
+            self.customer_covariates = read_file(
                 self.customer_covariates_file, self.secretkey)
-            self.customer_noisyembeddings = read_secret_dataframe(
+            self.customer_noisyembeddings = read_file(
                 self.customer_noisyembeddings_file, self.secretkey)
-            self.customer_truevaluations = read_secret_dataframe(
+            self.customer_truevaluations = read_file(
                 self.customer_truevaluations_file, self.secretkey)
 
     def get_current_customer(self):
