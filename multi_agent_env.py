@@ -36,10 +36,6 @@ class MultiAgentEnv_algopricing(object):  # gym.Env
         self.customer_noisyembeddings = None
         self.customer_truevaluations = None
 
-        self.secretkey = bytes(
-            # '0000000000000000ihopeyoudontknowmysecretkey=', 'utf-8')
-            '0000000000000000000000000000mycompsecretkey=', 'utf-8')
-
         self._init_data_files()
 
     def _init_data_files(self):
@@ -71,7 +67,6 @@ class MultiAgentEnv_algopricing(object):  # gym.Env
                 valuations = [
                     self.customer_truevaluations.loc[customerindex, 'item{}valuations'.format(itemnum)] for itemnum in range(self.n_items)
                 ]
-            # print((covariates, noisyembedding, valuations))
             self.customers.append((covariates, noisyembedding, valuations))
         else:  # have alredy created the customer, just retreiving it
             covariates, noisyembedding, valuations = self.customers[self.time]

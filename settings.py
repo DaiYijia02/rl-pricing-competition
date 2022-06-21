@@ -1,1 +1,1 @@
-default_params = {"n_items": 2}
+default_params = {"n_items": 3}
