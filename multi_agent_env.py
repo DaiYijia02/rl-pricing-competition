@@ -47,11 +47,11 @@ class MultiAgentEnv_algopricing(object):  # gym.Env
             return
         else:
             self.customer_covariates = read_file(
-                self.customer_covariates_file, self.secretkey)
+                self.customer_covariates_file)
             self.customer_noisyembeddings = read_file(
-                self.customer_noisyembeddings_file, self.secretkey)
+                self.customer_noisyembeddings_file)
             self.customer_truevaluations = read_file(
-                self.customer_truevaluations_file, self.secretkey)
+                self.customer_truevaluations_file)
 
     def get_current_customer(self):
         assert self.time <= len(self.customers)
