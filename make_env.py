@@ -3,8 +3,6 @@ From here mostly: https://github.com/openai/multiagent-particle-envs/blob/master
 """
 from settings import *
 
-
-# import multi_agent_env as MultiAgentEnv_algopricing
 from multi_agent_env import MultiAgentEnv_algopricing
 
 

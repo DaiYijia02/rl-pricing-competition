@@ -19,7 +19,7 @@ def read_file(file_name_str):
     return df
 
 class MultiAgentEnv_algopricing(object):  # gym.Env
-    def __init__(self, params, agent_names, n_agents=2, customer_covariates_file=None, customer_noisyembeddings_file=None, customer_valuations_file=None):
+    def __init__(self, params, agent_names, n_agents=3, customer_covariates_file=None, customer_noisyembeddings_file=None, customer_valuations_file=None):
         self.time = 0
         self.cumulative_buyer_utility = 0
         self.n_items = params["n_items"]
