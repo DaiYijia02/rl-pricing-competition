@@ -358,7 +358,7 @@ class Agent(object):
     def action(self, obs):
         new_buyer_covariates, new_buyer_embedding, last_sale, profit_each_team = obs
         # if this is the beginning of a new game
-        if last_sale[2][self.this_agent_number][0] == np.nan:
+        if last_sale[3][self.this_agent_number][0] == np.nan:
             self.ti = 0
             self.last_block = []
         #filling in missing user embedding
