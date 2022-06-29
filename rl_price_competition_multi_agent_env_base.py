@@ -83,7 +83,8 @@ class MultiPriceCompetitionEnv:
 
         self.customers = []
 
-        self.state = np.ravel([self.customer_covariates, self.customer_embedding, sale, self.seller_profits])
+        self.state = [np.nan for _ in range(12)]
+        # self.state = [self.customer_covariates, self.customer_embedding, sale, self.seller_profits]
 
         self.observation_space = [agent.observation_space for agent in self.sellers]
         self.action_space = [agent.action_space for agent in self.sellers]
