@@ -198,3 +198,8 @@ class MultiPriceCompetitionEnv:
 
     def get_last_dones(self):
         return dict(zip(self.seller_list, self.last_dones))
+
+    def observe(self, agent):
+        o = self.state
+        o = np.array(o, dtype=np.float32)
+        return o
