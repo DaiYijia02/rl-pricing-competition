@@ -20,7 +20,7 @@ sys.path.append(currentdir)
 
 # ------------------------------------------------------------------------------
 
-class Seller(Agent):
+class Seller:
     def __init__(
         self,
         seller_id, # needed when identifying which seller, should be 0,1,2...
