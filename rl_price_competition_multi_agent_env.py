@@ -99,6 +99,9 @@ class raw_env(AECEnv, EzPickle):
         self._dones_step_first()
         self.steps += 1
 
+    def observe(self, agent):
+        return self.env.observe(self.agent_name_mapping[agent])
+
     
 
     
