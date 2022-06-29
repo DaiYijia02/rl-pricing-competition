@@ -8,7 +8,7 @@ from pettingzoo.utils.conversions import parallel_wrapper_fn
 import sys
 import matplotlib.pyplot as plt
 
-from .rl_price_competition_multi_agent_env_base import MultiPriceCompetitionEnv as _env
+from rl_price_competition_multi_agent_env_base import MultiPriceCompetitionEnv as _env
 
 def env(**kwargs):
     env = raw_env(**kwargs)
@@ -59,23 +59,8 @@ class raw_env(AECEnv, EzPickle):
         self.dones = dict(zip(self.agents, [False for _ in self.agents]))
         self.infos = dict(zip(self.agents, [{} for _ in self.agents]))
 
-    def render(self, close_before=False, mode="human", close=False, time_update=10):
-        if self.time % time_update == 0:
-            if close_before:
-                plt.close()
-            for agent in range(self.n_agents):
-                name = "Agent {}: {}".format(agent, self.agent_names[agent])
-                plt.plot(
-                    list(range(self.time)),
-                    self.agent_profits_timeseries[agent],
-                    label=name,
-                )
-            plt.legend(frameon=False)
-            plt.xlabel("Time")
-            plt.ylabel("Profit")
-            sns.despine()
-            return True
-        return False
+    def render(self, mode="human"):
+        self.env.render(mode)
 
     def step(self, action):
         if self.dones[self.agent_selection]:

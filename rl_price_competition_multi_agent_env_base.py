@@ -7,12 +7,11 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import math
-from .. import env_configs
-from gym.envs.classic_control import rendering
 import random
 import os
 import sys
 import matplotlib.pyplot as plt
+from utils import Agent
 currentdir = os.path.dirname(os.path.realpath(__file__))
 renderdir = os.path.dirname(currentdir)
 sys.path.append(renderdir)
