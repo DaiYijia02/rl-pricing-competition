@@ -201,5 +201,6 @@ class MultiPriceCompetitionEnv:
 
     def observe(self, agent):
         o = self.state
+        print(o)
         o = np.array(o, dtype=np.float32)
         return o
