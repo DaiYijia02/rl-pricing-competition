@@ -53,7 +53,7 @@ class MultiAgentEnv_algopricing(object):  # gym.Env
         assert self.time <= len(self.customers)
         if len(self.customers) == self.time:  # create new customer
             if self.customer_covariates is None:
-                covariates = [0, 0, 0]
+                covariates = [1, 2, 1]
                 valuations = [random.random() * 2 for _ in range(self.n_items)]
                 noisyembedding = None
             else:
@@ -72,7 +72,7 @@ class MultiAgentEnv_algopricing(object):  # gym.Env
             covariates, noisyembedding, valuations = self.customers[self.time]
         return covariates, noisyembedding, valuations
 
-    def get_current_state_customer_to_send_agents(self, sale=(np.nan, np.nan, [[np.nan, np.nan], [np.nan, np.nan], [np.nan, np.nan]])):
+    def get_current_state_customer_to_send_agents(self, sale=(np.nan, np.nan, [[np.nan, np.nan], [np.nan, np.nan]])):
         customer_covariates, customer_embedding, customer_valuations = self.get_current_customer()
         state = self.agent_profits
         return customer_covariates, customer_embedding, sale, state

@@ -35,7 +35,7 @@ class Seller:
 
     @property
     def observation_space(self):
-        return spaces.Box(low=float('-inf'), high=float('inf'), shape=(13,),
+        return spaces.Box(low=float('-inf'), high=float('inf'), shape=(12,),
                                     dtype=np.float32)
 
     @property
@@ -83,7 +83,7 @@ class MultiPriceCompetitionEnv:
 
         self.customers = []
 
-        self.state = [np.nan for _ in range(12)]
+        self.state = [0.0 for _ in range(12)]
         # self.state = [self.customer_covariates, self.customer_embedding, sale, self.seller_profits]
 
         self.observation_space = [agent.observation_space for agent in self.sellers]
@@ -114,9 +114,8 @@ class MultiPriceCompetitionEnv:
             done: A bool flag indicating the end of the episode.
         """
          # action is array of size 4
-        action = action.reshape(2)
-        assert self.seller_list[agent_id].init is not False, agent_id
-        self.seller_list[agent_id].apply_action(action)
+        assert self.sellers[agent_id].init is not False, agent_id
+        self.sellers[agent_id].apply_action(action)
         if is_last:
 
             eps = 1e-7  # for random tie-breaking
@@ -130,7 +129,7 @@ class MultiPriceCompetitionEnv:
             # for each item, loop through agents. get lowest price for agent that has capacity left, keep track of which item if any the customer is buying
             for item in range(self.n_items):
                 value = valuations[item]
-                for agent in range(self.seller_list):
+                for agent in range(self.n_sellers):
                     util = value - action[agent][item]
                     if util >= 0 and util + (random.random() - 0.5) * eps > max_utility:
                         max_utility = util
@@ -141,13 +140,9 @@ class MultiPriceCompetitionEnv:
                 self.seller_profits[max_utility_agent] += action[
                     max_utility_agent
                 ][max_utility_item]
-                sale = (
-                    max_utility_item,
-                    max_utility_agent,
-                    action,
-                )
+                sale = np.concatenate(([max_utility_item, max_utility_agent],action.flatten()))
             else:
-                sale = (np.nan, np.nan, action)
+                sale = np.concatenate(([np.nan, np.nan],action.flatten()))
             for agent in range(self.n_sellers):
                 self.seller_profits_timeseries[agent].append(
                     self.seller_profits[agent])
@@ -167,7 +162,7 @@ class MultiPriceCompetitionEnv:
             done = self.timestep <= self.max_step
 
             # flatten and define state
-            self.state = [self.customer_covariates, self.customer_embedding, sale.flat, self.agent_profits]
+            self.state = np.concatenate((self.customer_covariates + [self.customer_embedding], sale, self.seller_profits))
 
             return self.state, rewards, done
 
