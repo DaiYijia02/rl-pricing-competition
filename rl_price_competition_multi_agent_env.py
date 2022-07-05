@@ -58,6 +58,8 @@ class raw_env(AECEnv, EzPickle):
         self.rewards = dict(zip(self.agents, [(0) for _ in self.agents]))
         self.dones = dict(zip(self.agents, [False for _ in self.agents]))
         self.infos = dict(zip(self.agents, [{} for _ in self.agents]))
+        if return_info==True:
+            return self.infos
 
     def render(self, mode="human"):
         self.env.render(mode)
@@ -100,6 +102,7 @@ class raw_env(AECEnv, EzPickle):
         self.steps += 1
 
     def observe(self, agent):
+        # observation of one agent is the previous state of the other
         return self.env.observe(self.agent_name_mapping[agent])
 
     
