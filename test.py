@@ -11,9 +11,9 @@ from stable_baselines3.ppo import CnnPolicy
 from stable_baselines3 import PPO
 
 
-env = rl_price_competition_multi_agent_env.env()
+env = rl_price_competition_multi_agent_env.parallel_env()
 
-parallel_test.parallel_api_test(env)
+# parallel_test.parallel_api_test(env)
 # api_test(env, num_cycles=1000, verbose_progress=False)
 # render_test(env)
 
