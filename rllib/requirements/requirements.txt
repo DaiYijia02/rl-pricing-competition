@@ -1,0 +1,8 @@
+gym
+rllib
+numpy
+dm_tree
+pandas
+scikit-image
+matplotlib
+'ray[tune]'
