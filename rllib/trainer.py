@@ -1,14 +1,6 @@
-"""Example of using two different training methods at once in multi-agent.
-Here we create a number of CartPole agents, some of which are trained with
-DQN, and some of which are trained with PPO. We periodically sync weights
-between the two algorithms (note that no such syncing is needed when using just
-a single training method).
-For a simpler example, see also: multiagent_cartpole.py
-"""
-
 import argparse
-import gym
 import os
+import numpy as np
 
 import ray
 from ray.rllib.algorithms.ppo import (
@@ -28,7 +20,7 @@ from ray.tune.registry import register_env
 from ray.rllib.policy.policy import PolicySpec
 
 parser = argparse.ArgumentParser()
-# Use torch for both policies.
+# Use torch.
 parser.add_argument(
     "--framework",
     choices=["tf", "tf2", "tfe", "torch"],
@@ -60,10 +52,10 @@ if __name__ == "__main__":
         "multi_agent_pricing_competition", lambda _: MultiPriceCompetitionEnv()
     )
     env = multi_agent_pricing_env.env()
+    # use an agent to get the observation space and the action space
     agent = env.sellers[0]
     obs_space = agent.observation_space
     act_space = agent.action_space
-
 
     def seelct_policy(algorithm, framework=None):
         if algorithm == "PPO":
@@ -94,13 +86,14 @@ if __name__ == "__main__":
         )
     }
 
-    #  Now only using ppo
+    # Only two agents, first is ppo, second is fixed price.
     def policy_mapping_fn(agent_id, episode, worker, **kwargs):
         if agent_id % 2 == 0:
             return "ppo_policy"
         else:
             return "fixed_price"
 
+    # Defining the printout in the console after each step.
     def on_postprocess_traj(info):
         """
         arg: {"agent_id": ..., "episode": ...,
@@ -109,7 +102,6 @@ if __name__ == "__main__":
             "all_pre_batches": (other agent ids),
             }
 
-        # https://github.com/ray-project/ray/blob/ee8c9ff7320ec6a2d7d097cd5532005c6aeb216e/rllib/policy/sample_batch.py
         Dictionaries in a sample_obj, k:
             t
             eps_id
@@ -136,84 +128,38 @@ if __name__ == "__main__":
         print('agent_id = {}'.format(agt_id))
         print('episode = {}'.format(eps_id))
         print('policy = {}'.format(policy_obj))
-        print('actions = {}'.format(sample_obj.columns(["actions"])))
+        print('actions = {}'.format(np.multiply(
+            sample_obj.columns(["actions"]), 5)+5))
         print('reward= {}'.format(sample_obj.columns(["rewards"])))
-
         return
 
-
-    # ppo = PPO(
-    #     env="multi_agent_pricing_competition",
-    #     config={
-    #         "multiagent": {
-    #             "policies": policies,
-    #             "policy_mapping_fn": policy_mapping_fn,
-    #             "policies_to_train": ["ppo_policy"],
-    #         },
-    #         "model": {
-    #             "vf_share_layers": True,
-    #         },
-    #         "num_sgd_iter": 6,
-    #         "vf_loss_coeff": 0.01,
-    #         # disable filters, otherwise we would need to synchronize those
-    #         # as well to the DQN agent
-    #         "observation_filter": "MeanStdFilter",
-    #         # Use GPUs iff `RLLIB_NUM_GPUS` env var set to > 0.
-    #         "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "0")),
-    #         "framework": args.framework,
-    #     },
-    # )
-
-
-    # You should see both the printed X and Y approach 200 as this trains:
-    # info:
-    #   policy_reward_mean:
-    #     ppo_policy: Y
-    # for i in range(args.stop_iters):
-    #     print("== Iteration", i, "==")
-
-    #     # improve the PPO policy
-    #     print("-- PPO --")
-    #     result_ppo = ppo.train()
-    #     print(pretty_print(result_ppo))
-
-    #     # Test passed gracefully.
-    #     if (
-    #         args.as_test
-    #         # and result_dqn["episode_reward_mean"] > args.stop_reward
-    #         and result_ppo["episode_reward_mean"] > args.stop_reward
-    #     ):
-    #         print("test passed (both agents above requested reward)")
-    #         quit(0)
-
-        # swap weights to synchronize
-        # dqn.set_weights(ppo.get_weights(["ppo_policy"]))
-
+    # The call to train the agent.
     tune.run("PPO",
-            config={"env":"multi_agent_pricing_competition",
-                    "framework":"torch",
-                    "multiagent": {
-                    "policies": policies,
-                    "policy_mapping_fn": policy_mapping_fn,
-                    "policies_to_train": ["ppo_policy"],
-                    },
-                    "model": {
-                        "vf_share_layers": True,
-                    },
-                    "num_sgd_iter": 50,
-                    "vf_loss_coeff": 0.01,
-                    "observation_filter": "MeanStdFilter",
-                    "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "0")),
-                    "framework": args.framework,
-                    "callbacks": {
-                        "on_postprocess_traj": on_postprocess_traj,
-                    }
-                        },
-            stop={"training_iteration": 20},
-            local_dir="multi_agent_pricing_competition",
-            progress_reporter=CustomReporter()
-            )
+             config={"env": "multi_agent_pricing_competition",
+                     "framework": "torch",
+                     "multiagent": {
+                         "policies": policies,
+                         "policy_mapping_fn": policy_mapping_fn,
+                         "policies_to_train": ["ppo_policy"],
+                     },
+                     "model": {
+                         "vf_share_layers": True,
+                     },
+                     "num_sgd_iter": 50,
+                     "vf_loss_coeff": 0.01,
+                     "observation_filter": "MeanStdFilter",
+                     "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "0")),
+                     "framework": args.framework,
+                     "callbacks": {
+                         "on_postprocess_traj": on_postprocess_traj,
+                     }
+                     },
+             stop={"training_iteration": 20},
+             local_dir="multi_agent_pricing_competition",
+             progress_reporter=CustomReporter()
+             )
 
     # Desired reward not reached.
     if args.as_test:
-        raise ValueError("Desired reward ({}) not reached!".format(args.stop_reward))
+        raise ValueError(
+            "Desired reward ({}) not reached!".format(args.stop_reward))

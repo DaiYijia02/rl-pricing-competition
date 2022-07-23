@@ -1,12 +1,10 @@
 from ray.rllib.policy.policy import Policy
 import numpy as np
 
-class FixedPricePolicy(Policy):
-    """Example of a custom policy written from scratch.
 
-    You might find it more convenient to use the `build_tf_policy` and
-    `build_torch_policy` helpers instead for a real policy, which are
-    described in the next sections.
+class FixedPricePolicy(Policy):
+    """
+    An agent that gives fixed price for two items.
     """
 
     def __init__(self, observation_space, action_space, config):
@@ -22,7 +20,7 @@ class FixedPricePolicy(Policy):
                         episodes=None,
                         **kwargs):
         # return action batch, RNN states, extra values to include in batch
-        # action is (-1, 1) projected to the action space
+        # Action is (-1, 1) projected to the action space
         return [np.array([-0.2, 0.8]) for _ in obs_batch], [], {}
 
     def learn_on_batch(self, samples):

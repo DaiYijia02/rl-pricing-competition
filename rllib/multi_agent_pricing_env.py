@@ -30,26 +30,28 @@ class Seller:
             'sale': gym.spaces.Box(
             low=-1, high=11, shape=(6,), dtype=np.float32),
             'seller_profits': gym.spaces.Box(
-            low=-10000, high=10000000, shape=(2,), dtype=np.float32),}
+            low=-10000, high=10000000, shape=(2,), dtype=np.float32), }
         dict_space = gym.spaces.Dict(spaces)
         return dict_space
 
     @property
     def action_space(self):
         return gym.spaces.Box(low=0, high=10, shape=(self.n_items,),
-                          dtype=np.float32)
+                              dtype=np.float32)
 
     def step(self, action, prices, state):
         self.timestep += 1
         prices[self.seller_id] = action
         return state, 0.0, self.timestep >= self.max_step, {self.seller_id: action}
-    
+
     def get_observation(self, state):
         return state
+
 
 def env(**kwargs):
     env = MultiPriceCompetitionEnv(**kwargs)
     return env
+
 
 class MultiPriceCompetitionEnv(MultiAgentEnv):
 
@@ -57,9 +59,10 @@ class MultiPriceCompetitionEnv(MultiAgentEnv):
 
     def __init__(self, n_sellers=2, n_items=2, customer_covariates=None, customer_embedding=None, max_step=1000):
         """
-        n_agents: number of sellers in the pricing competition
+        n_sellers: number of sellers in the pricing competition
         n_items: number of items available, same for each seller
         customer_covariates: TODO the demographic covariates distribution of customers
+        customer_embedding: TODO the noise distribution of customers
         maxstep: after max_step steps all agents will return done
         """
 
@@ -67,9 +70,9 @@ class MultiPriceCompetitionEnv(MultiAgentEnv):
         self.n_sellers = n_sellers
         self.n_items = n_items
         self.max_step = max_step
-        if customer_covariates==None:
+        if customer_covariates == None:
             self.customer_covariates = np.array([1.0, 1.0, 1.0])
-        if customer_embedding==None:
+        if customer_embedding == None:
             self.customer_embedding = np.array([0.0])
 
         self.timestep = 0
@@ -90,9 +93,9 @@ class MultiPriceCompetitionEnv(MultiAgentEnv):
         self.customers = []
 
         self.state = OrderedDict([('customer_covariates', self.customer_covariates),
-            ('customer_embedding', self.customer_embedding),
-            ('sale', self.sale_0),
-            ('seller_profits', self.seller_profits),])
+                                  ('customer_embedding', self.customer_embedding),
+                                  ('sale', self.sale_0),
+                                  ('seller_profits', self.seller_profits), ])
 
         self.observation_space = [
             agent.observation_space for agent in self.sellers]
@@ -112,31 +115,35 @@ class MultiPriceCompetitionEnv(MultiAgentEnv):
         self.customers = []
 
         self.state = OrderedDict([('customer_covariates', self.customer_covariates),
-            ('customer_embedding', self.customer_embedding),
-            ('sale', self.sale_0),
-            ('seller_profits', self.seller_profits),])
+                                  ('customer_embedding', self.customer_embedding),
+                                  ('sale', self.sale_0),
+                                  ('seller_profits', self.seller_profits), ])
 
         return {i: a.get_observation(self.state) for i, a in enumerate(self.sellers)}
 
     def step(self, action_dict):
+        """action_dict: action for each agent"""
+
         obs, rew, done, info = {}, {}, {}, {}
-        prices = [[0 for _ in range(self.n_sellers)] for _ in range(self.n_items)]
+        prices = [[0 for _ in range(self.n_sellers)]
+                  for _ in range(self.n_items)]
         for i, action in action_dict.items():
-            obs[i], rew[i], done[i], info[i] = self.sellers[i].step(action, prices, self.state)
+            obs[i], rew[i], done[i], info[i] = self.sellers[i].step(
+                action, prices, self.state)
             if done[i]:
                 self.dones.add(i)
         done["__all__"] = len(self.dones) == len(self.sellers)
 
-        #Start true stepping
         eps = 1e-7  # for random tie-breaking
 
-        valuations = np.array([5.0, 10.0]) # naive customer valuation, later can be calculated with covariate distribution
+        # Naive customer valuation, later can be calculated with covariate distribution
+        valuations = np.array([5.0, 10.0])
 
         max_utility = 0
         max_utility_item = -1
         max_utility_agent = -1
 
-        # for each item, loop through agents. get lowest price for agent that has capacity left, keep track of which item if any the customer is buying
+        # For each item, loop through agents. Get lowest price for agent that has capacity left, keep track of which item if any the customer is buying
         for item in range(self.n_items):
             value = valuations[item]
             for agent in range(self.n_sellers):
@@ -158,22 +165,18 @@ class MultiPriceCompetitionEnv(MultiAgentEnv):
             self.seller_profits_timeseries[agent].append(
                 self.seller_profits[agent])
 
-        # set rewards
+        # Set rewards
         for agent in self.seller_ids:
             if max_utility_agent == agent:
                 rew[agent] = prices[agent][max_utility_item]
-                # rew[agent] = self.seller_profits[agent]
-                # rew[agent] = 5
             else:
                 rew[agent] = 0
 
+        # Set current observation state
         self.state = OrderedDict([('customer_covariates', self.customer_covariates),
-            ('customer_embedding', self.customer_embedding),
-            ('sale', sale),
-            ('seller_profits', self.seller_profits),])
-        
-        print("price"+str(prices))
-        print("rew"+str(rew))
+                                  ('customer_embedding', self.customer_embedding),
+                                  ('sale', sale),
+                                  ('seller_profits', self.seller_profits), ])
 
         return obs, rew, done, info
 
@@ -194,4 +197,3 @@ class MultiPriceCompetitionEnv(MultiAgentEnv):
             sys.despine()
             return True
         return False
-
