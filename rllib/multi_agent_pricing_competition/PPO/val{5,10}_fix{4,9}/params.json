@@ -1,0 +1,34 @@
+{
+  "callbacks": {
+    "on_postprocess_traj": "<function on_postprocess_traj at 0x7fb25c34f4c0>"
+  },
+  "env": "multi_agent_pricing_competition",
+  "framework": "torch",
+  "model": {
+    "vf_share_layers": true
+  },
+  "multiagent": {
+    "policies": {
+      "fixed_price": [
+        "<class 'fixed_price_policy.FixedPricePolicy'>",
+        "Dict(customer_covariates:Box(0.0, 1.0, (3,), float32), customer_embedding:Box(0.0, 1.0, (1,), float32), sale:Box(-1.0, 11.0, (6,), float32), seller_profits:Box(-10000.0, 10000000.0, (2,), float32))",
+        "Box(0.0, 10.0, (2,), float32)",
+        {}
+      ],
+      "ppo_policy": [
+        "<class 'ray.rllib.algorithms.ppo.ppo_torch_policy.PPOTorchPolicy'>",
+        "Dict(customer_covariates:Box(0.0, 1.0, (3,), float32), customer_embedding:Box(0.0, 1.0, (1,), float32), sale:Box(-1.0, 11.0, (6,), float32), seller_profits:Box(-10000.0, 10000000.0, (2,), float32))",
+        "Box(0.0, 10.0, (2,), float32)",
+        {}
+      ]
+    },
+    "policies_to_train": [
+      "ppo_policy"
+    ],
+    "policy_mapping_fn": "<function policy_mapping_fn at 0x7fb25c34f430>"
+  },
+  "num_gpus": 0,
+  "num_sgd_iter": 50,
+  "observation_filter": "MeanStdFilter",
+  "vf_loss_coeff": 0.01
+}
