@@ -18,9 +18,6 @@ sys.path.append(renderdir)
 currentdir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(currentdir)
 
-# ------------------------------------------------------------------------------
-
-
 class Seller:
     def __init__(
         self,
