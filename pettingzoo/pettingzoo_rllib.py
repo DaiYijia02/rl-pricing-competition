@@ -38,17 +38,17 @@ class CNNModelV2(TorchModelV2, nn.Module):
 
 def env_creator(args):
     env = rl_price_competition_multi_agent_env.parallel_env()
-    # env = ss.color_reduction_v0(env, mode="B")
-    # env = ss.dtype_v0(env, "float32")
-    # env = ss.resize_v1(env, x_size=84, y_size=84)
-    # env = ss.frame_stack_v1(env, 3)
-    # env = ss.normalize_obs_v0(env, env_min=0, env_max=1)
+    # choose the below customize setup
+    env = ss.color_reduction_v0(env, mode="B")
+    env = ss.dtype_v0(env, "float32")
+    env = ss.resize_v1(env, x_size=84, y_size=84)
+    env = ss.frame_stack_v1(env, 3)
+    env = ss.normalize_obs_v0(env, env_min=0, env_max=1)
     return env
 
 
 if __name__ == "__main__":
-    # shutdown()
-
+    
     env_name = "pricing_competition"
 
     register_env(env_name, lambda config: ParallelPettingZooEnv(env_creator(config)))
@@ -89,12 +89,12 @@ if __name__ == "__main__":
             "num_envs_per_worker": 1,
             "compress_observations": False,
             "batch_mode": "truncate_episodes",
-            # 'use_critic': True,
+            "use_critic": True,
             "use_gae": True,
             "lambda": 0.9,
             "gamma": 0.99,
-            # "kl_coeff": 0.001,
-            # "kl_target": 1000.,
+            "kl_coeff": 0.001,
+            "kl_target": 1000.,
             "clip_param": 0.4,
             "grad_clip": None,
             "entropy_coeff": 0.1,
