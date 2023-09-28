@@ -10,38 +10,7 @@ import gym
 from stable_baselines3.ppo import CnnPolicy
 from stable_baselines3 import PPO
 
-
 env = rl_price_competition_multi_agent_env.parallel_env()
-
-# parallel_test.parallel_api_test(env)
-# api_test(env, num_cycles=1000, verbose_progress=False)
-# render_test(env)
-
-# env.reset()
-# agents = env.agents
-# print(agents)
-# env.reset()
-# select = env.agent_selection
-# print(select)
-# print(env.last())
-# env.step(action=[[1,2],[2,2]])
-# print(env.last())
-# print(new_obs)
-# select = env.agent_selection
-# print(select)
-
-# model = PPO(CnnPolicy, env, verbose=3, gamma=0.95, n_steps=256, ent_coef=0.0905168, learning_rate=0.00062211, vf_coef=0.042202, max_grad_norm=0.9, gae_lambda=0.99, n_epochs=5, clip_range=0.3, batch_size=256)
-# model.learn(total_timesteps=2000000)
-# model.save("policy")
-
-# model = PPO.load("policy")
-
-# env.reset()
-# for agent in env.agent_iter():
-#    obs, reward, done, info = env.last()
-#    act = model.predict(obs, deterministic=True)[0] if not done else None
-#    env.step(act)
-#    env.render()
 
 def test_observation(observation, observation_0):
     if isinstance(observation, np.ndarray):
@@ -213,16 +182,3 @@ def play_test(env, observation_0, num_cycles):
         test_reward(reward)
         observation = env.step(action)
         assert observation is None, "step() must not return anything"
-
-# env.reset()
-# observation_0, _, _, _ = env.last()
-# test_observation(observation_0, observation_0)
-
-# non_observe, _, _, _ = env.last(observe=False)
-# assert non_observe is None, "last must return a None when observe=False"
-
-# print("Finished test_observation")
-
-# play_test(env, observation_0, 10)
-
-# print("Finished play test")
